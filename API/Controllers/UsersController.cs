@@ -1,14 +1,16 @@
 ﻿using API.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
-[ApiController]
+// [ApiController]
+// [Route("api/[controller]")]
 // Take first part of the name of the controller and use that as a route (/api/users)
 // When request comes in it will be routed to this controller
-[Route("api/[controller]")]
-public class UsersController : ControllerBase
+[Authorize]
+public class UsersController : BaseApiController
 {
     private readonly AppDbContext _context;
 
@@ -18,6 +20,7 @@ public class UsersController : ControllerBase
         _context = context;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
     {
@@ -26,15 +29,17 @@ public class UsersController : ControllerBase
         var users = await _context.Users.ToListAsync();
 
         // 200 ok response also return by framework
-        // letting the framework create correct type of response
+        // Letting the framework create correct type of response
         return users;
-        //return Ok(users);
+
         // Explicit return 200 Ok response
+        //return Ok(users);
+        
     }
 
     //[HttpGet]
     //[Route("{id}")]
-    // api/users/2
+    // GET: api/users/2
     [HttpGet("{id}")]
     public async Task<ActionResult<AppUser>> GetUser(int id)
     {
